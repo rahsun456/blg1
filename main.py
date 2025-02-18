@@ -158,17 +158,63 @@ elif st.session_state.page == "bulk article generator":
             min_words = st.number_input("Minimum Words", min_value=300, value=600)
             include_images = st.checkbox("Include AI-generated Images", value=True)
 
+        # Date selection
+        today = datetime.date.today()
+        start_date = st.date_input("Start Date", today - datetime.timedelta(days=7))
+        end_date = st.date_input("End Date", today)
+
         if st.button("Generate Articles"):
             with st.spinner("Generating articles..."):
-                # Implementation for article generation...
-                st.success("Articles generated successfully!")
+                try:
+                    # Clear previous articles
+                    if 'generated_articles' not in st.session_state:
+                        st.session_state.generated_articles = []
+                    
+                    # Generate unique key for each article
+                    seen_titles = {article['title'] for article in st.session_state.generated_articles}
+                    
+                    new_articles = []  # Store new articles here
+                    
+                    # Your article generation logic here...
+                    # For demonstration, adding sample article
+                    sample_article = {
+                        'id': len(st.session_state.generated_articles) + 1,
+                        'title': 'Sample Article',
+                        'content': 'Sample content...',
+                        'status': 'draft',
+                        'word_count': 600,
+                        'date': datetime.date.today()
+                    }
+                    
+                    if sample_article['title'] not in seen_titles:
+                        new_articles.append(sample_article)
+                    
+                    # Add new articles to session state
+                    st.session_state.generated_articles.extend(new_articles)
+                    st.success(f"Generated {len(new_articles)} new articles successfully!")
+                except Exception as e:
+                    st.error(f"Error generating articles: {str(e)}")
 
         # Display Generated Articles
         if st.session_state.generated_articles:
             st.header("Generated Articles")
-            for article in st.session_state.generated_articles:
-                with st.expander(article['title']):
-                    st.write(f"Status: {article['status']}")
-                    st.write(f"Word Count: {article['word_count']}")
-                    if st.button(f"View Full Content", key=article['id']):
-                        st.write(article['content'])
+            
+            # Filter articles by date
+            filtered_articles = [
+                article for article in st.session_state.generated_articles 
+                if start_date <= article['date'] <= end_date
+            ]
+            
+            if not filtered_articles:
+                st.info("No articles found for the selected date range.")
+            else:
+                for article in filtered_articles:
+                    with st.expander(f"{article['title']} - {article['date']}"):
+                        st.write(f"Status: {article['status']}")
+                        st.write(f"Word Count: {article['word_count']}")
+                        st.write(f"Date: {article['date']}")
+                        st.text_area("Content", article['content'], height=200)
+                        
+                        if st.button("Delete", key=f"delete_{article['id']}"):
+                            st.session_state.generated_articles.remove(article)
+                            st.rerun()
