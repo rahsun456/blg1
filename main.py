@@ -2,10 +2,13 @@
 import streamlit as st
 import json
 from utils.feed_parser import FeedParser
-
-# Configure Streamlit
-st.set_page_config(page_title="AI Content Generator")
 import os
+
+# Force kill any existing Streamlit processes
+os.system("pkill -f streamlit")
+
+# Configure Streamlit with proper port handling
+st.set_page_config(page_title="AI Content Generator")
 from utils.content_generator import ContentGenerator
 from utils.wordpress_api import WordPressAPI
 from utils.seo_optimizer import SEOOptimizer
