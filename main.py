@@ -167,22 +167,27 @@ elif st.session_state.page == "bulk article generator":
         if 'fetched_articles' not in st.session_state:
             st.session_state.fetched_articles = []
 
+        # Article fetch count control
+        num_articles = st.number_input("Number of articles to fetch", min_value=1, max_value=50, value=2)
+
         if st.button("Fetch Articles"):
             with st.spinner("Fetching articles..."):
                 try:
+                    # Clear previous fetched articles
+                    st.session_state.fetched_articles = []
+                    
                     # Fetch articles from selected feeds
                     if source_type == "RSS Feeds":
                         fetched = []
                         for feed_url in selected_feeds:
                             entries = st.session_state.feed_parser.parse_feed(feed_url)
                             fetched.extend(entries)
-                        st.session_state.fetched_articles = fetched
-                        st.success(f"Fetched {len(fetched)} articles successfully!")
+                            
+                        # Only keep the requested number of articles
+                        st.session_state.fetched_articles = fetched[:num_articles]
+                        st.success(f"Fetched {len(st.session_state.fetched_articles)} articles successfully!")
                 except Exception as e:
                     st.error(f"Error fetching articles: {str(e)}")
-
-        # Article fetch count control
-        num_articles = st.number_input("Number of articles to fetch", min_value=1, max_value=50, value=10)
 
         # Display fetched articles for selection
         if st.session_state.fetched_articles:
@@ -204,9 +209,11 @@ elif st.session_state.page == "bulk article generator":
                         selected_articles.append(article)
                 with col2:
                     with st.expander(f"{idx + 1}. {article['title']}"):
-                        st.write(f"Status: {article['status']}")
-                        st.write(f"Word Count: {article['word_count']}")
-                        st.write(f"Date: {article['date']}")
+                        st.write(f"Source: {article.get('source', 'Unknown')}")
+                        st.write(f"Published: {article.get('published', 'Unknown date')}")
+                        if 'content' in article:
+                            word_count = len(article['content'].split())
+                            st.write(f"Word Count: {word_count}")
 
                         # Check SEO optimization
                         is_seo_optimized = (
