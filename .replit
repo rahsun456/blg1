@@ -1,0 +1,19 @@
+modules = ["python-3.11"]
+
+[nix]
+channel = "stable-24_05"
+
+[workflows]
+runButton = "Run"
+
+[[workflows.workflow]]
+name = "Run"
+author = 39764849
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "streamlit run main.py --server.address=0.0.0.0 --server.headless true --server.enableCORS=false --server.enableWebsocketCompression=false"
+
+[[ports]]
+localPort = 8501
+externalPort = 80
