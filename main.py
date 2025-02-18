@@ -185,7 +185,7 @@ elif st.session_state.page == "bulk article generator":
         if st.session_state.fetched_articles:
             st.subheader("Select Articles to Rewrite")
             selected_articles = []
-            
+
             for idx, article in enumerate(st.session_state.fetched_articles):
                 col1, col2 = st.columns([0.1, 0.9])
                 with col1:
@@ -206,10 +206,10 @@ elif st.session_state.page == "bulk article generator":
                                 'title': article['title'],
                                 'content': article['content']
                             })
-                            
+
                             if isinstance(generated, str):
                                 generated = json.loads(generated)
-                                
+
                             new_article = {
                                 'id': len(st.session_state.generated_articles) + 1,
                                 'title': generated['title'],
@@ -222,22 +222,22 @@ elif st.session_state.page == "bulk article generator":
                                 'date': datetime.date.today()
                             }
                             new_articles.append(new_article)
-                        
+
                         st.session_state.generated_articles.extend(new_articles)
                         st.success(f"Generated {len(new_articles)} optimized articles successfully!")
-                except Exception as e:
-                    st.error(f"Error generating articles: {str(e)}")
+                    except Exception as e:
+                        st.error(f"Error generating articles: {str(e)}")
 
         # Display Generated Articles
         if st.session_state.generated_articles:
             st.header("Generated Articles")
-            
+
             # Filter articles by date
             filtered_articles = [
                 article for article in st.session_state.generated_articles 
                 if start_date <= article['date'] <= end_date
             ]
-            
+
             if not filtered_articles:
                 st.info("No articles found for the selected date range.")
             else:
@@ -247,7 +247,7 @@ elif st.session_state.page == "bulk article generator":
                         st.write(f"Word Count: {article['word_count']}")
                         st.write(f"Date: {article['date']}")
                         st.text_area("Content", article['content'], height=200)
-                        
+
                         if st.button("Delete", key=f"delete_{article['id']}"):
                             st.session_state.generated_articles.remove(article)
                             st.rerun()
