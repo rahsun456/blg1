@@ -164,35 +164,67 @@ elif st.session_state.page == "bulk article generator":
         start_date = st.date_input("Start Date", today - datetime.timedelta(days=7))
         end_date = st.date_input("End Date", today)
 
-        if st.button("Generate Articles"):
-            with st.spinner("Generating articles..."):
+        if 'fetched_articles' not in st.session_state:
+            st.session_state.fetched_articles = []
+
+        if st.button("Fetch Articles"):
+            with st.spinner("Fetching articles..."):
                 try:
-                    # Clear previous articles
-                    if 'generated_articles' not in st.session_state:
-                        st.session_state.generated_articles = []
-                    
-                    # Generate unique key for each article
-                    seen_titles = {article['title'] for article in st.session_state.generated_articles}
-                    
-                    new_articles = []  # Store new articles here
-                    
-                    # Your article generation logic here...
-                    # For demonstration, adding sample article
-                    sample_article = {
-                        'id': len(st.session_state.generated_articles) + 1,
-                        'title': 'Sample Article',
-                        'content': 'Sample content...',
-                        'status': 'draft',
-                        'word_count': 600,
-                        'date': datetime.date.today()
-                    }
-                    
-                    if sample_article['title'] not in seen_titles:
-                        new_articles.append(sample_article)
-                    
-                    # Add new articles to session state
-                    st.session_state.generated_articles.extend(new_articles)
-                    st.success(f"Generated {len(new_articles)} new articles successfully!")
+                    # Fetch articles from selected feeds
+                    if source_type == "RSS Feeds":
+                        fetched = []
+                        for feed_url in selected_feeds:
+                            entries = st.session_state.feed_parser.parse_feed(feed_url)
+                            fetched.extend(entries)
+                        st.session_state.fetched_articles = fetched
+                        st.success(f"Fetched {len(fetched)} articles successfully!")
+                except Exception as e:
+                    st.error(f"Error fetching articles: {str(e)}")
+
+        # Display fetched articles for selection
+        if st.session_state.fetched_articles:
+            st.subheader("Select Articles to Rewrite")
+            selected_articles = []
+            
+            for idx, article in enumerate(st.session_state.fetched_articles):
+                col1, col2 = st.columns([0.1, 0.9])
+                with col1:
+                    if st.checkbox("", key=f"select_{idx}"):
+                        selected_articles.append(article)
+                with col2:
+                    with st.expander(f"{article['title']}"):
+                        st.write(article['content'])
+                        st.caption(f"Source: {article['source']}")
+
+            if selected_articles and st.button("Rewrite Selected Articles"):
+                with st.spinner("Generating optimized articles..."):
+                    try:
+                        new_articles = []
+                        for article in selected_articles:
+                            # Generate optimized content using ContentGenerator
+                            generated = st.session_state.content_generator.generate_content({
+                                'title': article['title'],
+                                'content': article['content']
+                            })
+                            
+                            if isinstance(generated, str):
+                                generated = json.loads(generated)
+                                
+                            new_article = {
+                                'id': len(st.session_state.generated_articles) + 1,
+                                'title': generated['title'],
+                                'content': generated['content'],
+                                'status': 'draft',
+                                'meta_description': generated['meta_description'],
+                                'keywords': generated['keywords'],
+                                'slug': generated['slug'],
+                                'word_count': len(generated['content'].split()),
+                                'date': datetime.date.today()
+                            }
+                            new_articles.append(new_article)
+                        
+                        st.session_state.generated_articles.extend(new_articles)
+                        st.success(f"Generated {len(new_articles)} optimized articles successfully!")
                 except Exception as e:
                     st.error(f"Error generating articles: {str(e)}")
 
