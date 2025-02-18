@@ -47,13 +47,7 @@ if 'site_config' not in st.session_state:
 if 'generated_articles' not in st.session_state:
     st.session_state.generated_articles = []
 
-# Handle graceful shutdown
-def signal_handler(sig, frame):
-    print('Shutting down gracefully...')
-    sys.exit(0)
-
-signal.signal(signal.SIGINT, signal_handler)
-signal.signal(signal.SIGTERM, signal_handler)
+# Streamlit handles process management internally
 
 # Navigation
 st.sidebar.title("Navigation")
