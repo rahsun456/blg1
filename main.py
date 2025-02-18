@@ -5,8 +5,12 @@ import os
 import signal
 import sys
 
-# Force kill any existing Streamlit processes
-os.system("pkill -9 -f streamlit")
+# Set Streamlit configuration before importing anything else
+st.set_page_config(
+    page_title="AI Content Generator",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
 # Configure Streamlit
 st.set_page_config(page_title="AI Content Generator")
