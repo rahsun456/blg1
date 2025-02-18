@@ -1,19 +1,21 @@
-
 import streamlit as st
 import json
 from utils.feed_parser import FeedParser
 import os
+import signal
+import sys
 
 # Force kill any existing Streamlit processes
-os.system("pkill -f streamlit")
+os.system("pkill -9 -f streamlit")
 
-# Configure Streamlit with proper port handling
+# Configure Streamlit
 st.set_page_config(page_title="AI Content Generator")
+
+# Import after configuration
 from utils.content_generator import ContentGenerator
 from utils.wordpress_api import WordPressAPI
 from utils.seo_optimizer import SEOOptimizer
 from utils.trend_analyzer import TrendAnalyzer
-import time
 
 # Initialize session state
 if 'page' not in st.session_state:
@@ -36,6 +38,15 @@ if 'site_config' not in st.session_state:
     st.session_state.site_config = {}
 if 'generated_articles' not in st.session_state:
     st.session_state.generated_articles = []
+
+# Handle graceful shutdown
+def signal_handler(sig, frame):
+    print('Shutting down gracefully...')
+    os.system("pkill -9 -f streamlit")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 
 # Navigation
 st.sidebar.title("Navigation")
