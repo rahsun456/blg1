@@ -4,6 +4,7 @@ from utils.feed_parser import FeedParser
 import os
 import signal
 import sys
+import streamlit.bootstrap as stb
 
 # Set Streamlit configuration before importing anything else
 st.set_page_config(
@@ -43,11 +44,20 @@ if 'generated_articles' not in st.session_state:
 # Handle graceful shutdown
 def signal_handler(sig, frame):
     print('Shutting down gracefully...')
-    os.system("pkill -9 -f streamlit")
     sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
+
+# Configure server address
+if __name__ == '__main__':
+    st._is_running_with_streamlit = True
+    stb.load_config_options(flag_options={
+        'server.address': '0.0.0.0',
+        'server.port': 8501,
+        'server.headless': True,
+        'browser.serverAddress': '0.0.0.0'
+    })
 
 # Navigation
 st.sidebar.title("Navigation")
