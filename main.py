@@ -12,9 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Configure Streamlit
-st.set_page_config(page_title="AI Content Generator")
-
 # Import after configuration
 from utils.content_generator import ContentGenerator
 from utils.wordpress_api import WordPressAPI
