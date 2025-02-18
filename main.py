@@ -2,6 +2,9 @@
 import streamlit as st
 import json
 from utils.feed_parser import FeedParser
+
+# Configure Streamlit to run on 0.0.0.0
+st.set_page_config(page_title="AI Content Generator")
 import os
 from utils.content_generator import ContentGenerator
 from utils.wordpress_api import WordPressAPI
