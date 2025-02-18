@@ -71,7 +71,31 @@ class ContentGenerator:
             Create an SEO-optimized blog post based on this content:
             Title: {source_content['title']}
             Source Content: {source_content['content']}
-            Focus Keyword: {keywords[0]}
+            Focus Keyword: {keywords[0] if keywords else ''}
+            
+            Requirements:
+            1. Title must:
+               - Be in Hindi
+               - Include focus keyword near beginning
+               - Be 50-60 characters long
+               
+            2. Meta Description must:
+               - Be in Hindi
+               - Include focus keyword near beginning  
+               - Be 150-160 characters long
+               - Be compelling and encourage clicks
+               
+            3. URL slug must:
+               - Use English transliteration 
+               - Include focus keyword
+               - Use hyphens between words
+               - Be concise (3-5 words maximum)
+               
+            4. Content must:
+               - Be minimum 600 words in Hindi
+               - Include focus keyword in first paragraph
+               - Have proper keyword density (1-3%)
+               - Use proper heading hierarchy (H1, H2, H3)
             
             Follow these SEO requirements strictly:
             1. Title must:

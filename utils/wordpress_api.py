@@ -163,7 +163,7 @@ class WordPressAPI:
             raise Exception(f"Error uploading media: {str(e)}")
 
     def create_post(self, content: Dict, status: str = 'draft') -> Dict:
-        """Create a WordPress post"""
+        """Create a new WordPress post with SEO metadata"""
         try:
             endpoint = f"{self.wp_url}/wp-json/wp/v2/posts"
 
@@ -171,9 +171,12 @@ class WordPressAPI:
                 'title': content['title'],
                 'content': content['content'],
                 'status': status,
+                'slug': content.get('slug', ''),
                 'meta': {
                     '_yoast_wpseo_metadesc': content.get('meta_description', ''),
-                    '_yoast_wpseo_focuskw': content.get('keywords', '')
+                    '_yoast_wpseo_focuskw': content.get('keywords', '').split(',')[0],
+                    '_yoast_wpseo_meta-robots-noindex': '0',
+                    '_yoast_wpseo_meta-robots-nofollow': '0'
                 }
             }
 
