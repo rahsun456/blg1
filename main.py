@@ -4,9 +4,15 @@ from utils.feed_parser import FeedParser
 import os
 import signal
 import sys
-import streamlit.bootstrap as stb
 
-# Set Streamlit configuration before importing anything else
+# Set environment variables for Streamlit configuration
+os.environ['STREAMLIT_SERVER_PORT'] = '8501'
+os.environ['STREAMLIT_SERVER_ADDRESS'] = '0.0.0.0'
+os.environ['STREAMLIT_SERVER_HEADLESS'] = 'true'
+
+import streamlit as st
+
+# Set Streamlit configuration
 st.set_page_config(
     page_title="AI Content Generator",
     layout="wide",
@@ -48,16 +54,6 @@ def signal_handler(sig, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
-
-# Configure server address
-if __name__ == '__main__':
-    st._is_running_with_streamlit = True
-    stb.load_config_options(flag_options={
-        'server.address': '0.0.0.0',
-        'server.port': 8501,
-        'server.headless': True,
-        'browser.serverAddress': '0.0.0.0'
-    })
 
 # Navigation
 st.sidebar.title("Navigation")
