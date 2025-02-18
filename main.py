@@ -181,20 +181,53 @@ elif st.session_state.page == "bulk article generator":
                 except Exception as e:
                     st.error(f"Error fetching articles: {str(e)}")
 
+        # Article fetch count control
+        num_articles = st.number_input("Number of articles to fetch", min_value=1, max_value=50, value=10)
+
         # Display fetched articles for selection
         if st.session_state.fetched_articles:
             st.subheader("Select Articles to Rewrite")
             selected_articles = []
 
-            for idx, article in enumerate(st.session_state.fetched_articles):
+            # Remove duplicates based on title
+            seen_titles = set()
+            unique_articles = []
+            for article in st.session_state.fetched_articles[:num_articles]:
+                if article['title'] not in seen_titles:
+                    seen_titles.add(article['title'])
+                    unique_articles.append(article)
+
+            for idx, article in enumerate(unique_articles):
                 col1, col2 = st.columns([0.1, 0.9])
                 with col1:
                     if st.checkbox("", key=f"select_{idx}"):
                         selected_articles.append(article)
                 with col2:
-                    with st.expander(f"{article['title']}"):
-                        st.write(article['content'])
-                        st.caption(f"Source: {article['source']}")
+                    with st.expander(f"{idx + 1}. {article['title']}"):
+                        st.write(f"Status: {article['status']}")
+                        st.write(f"Word Count: {article['word_count']}")
+                        st.write(f"Date: {article['date']}")
+
+                        # Check SEO optimization
+                        is_seo_optimized = (
+                            article['word_count'] >= 600 and
+                            'keywords' in article and
+                            'meta_description' in article
+                        )
+                        st.write(f"SEO Optimized: {'✅' if is_seo_optimized else '❌'}")
+
+                        st.text_area("Content", article['content'], height=200)
+
+                        # Add WordPress publish button
+                        if st.button("Publish to WordPress", key=f"publish_{article['id']}_{article['title'][:20]}"):
+                            if 'wordpress_api' in st.session_state and st.session_state.wordpress_api:
+                                try:
+                                    response = st.session_state.wordpress_api.create_post(article)
+                                    st.success(f"Published to WordPress! Post ID: {response['id']}")
+                                except Exception as e:
+                                    st.error(f"Failed to publish: {str(e)}")
+                            else:
+                                st.warning("Please configure WordPress site in Site Management first")
 
             if selected_articles and st.button("Rewrite Selected Articles"):
                 with st.spinner("Generating optimized articles..."):
