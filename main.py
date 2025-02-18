@@ -248,6 +248,6 @@ elif st.session_state.page == "bulk article generator":
                         st.write(f"Date: {article['date']}")
                         st.text_area("Content", article['content'], height=200)
 
-                        if st.button("Delete", key=f"delete_{article['id']}"):
+                        if st.button("Delete", key=f"delete_{article['id']}_{article['title'][:20]}"):
                             st.session_state.generated_articles.remove(article)
                             st.rerun()
