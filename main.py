@@ -3,10 +3,8 @@ import streamlit as st
 import json
 from utils.feed_parser import FeedParser
 
-# Configure Streamlit to run on 0.0.0.0:8501
+# Configure Streamlit
 st.set_page_config(page_title="AI Content Generator")
-st.server.server.port = 8501
-st.server.server.address = "0.0.0.0"
 import os
 from utils.content_generator import ContentGenerator
 from utils.wordpress_api import WordPressAPI
